@@ -2,17 +2,12 @@ pipeline {
   agent any
 
   tools {nodejs "NodeJS_9"}
-environment {
-PATH="${PATH}:/usr/local/bin/npm"
-}
   stages {
     stage('Test') {
       steps {
-       nodejs(nodeJSInstallationName: 'NodeJS_9') {
-                       sh 'npm install'
-                  }
+      // nodejs(nodeJSInstallationName: 'NodeJS_9') {sh 'npm install'}
          sh 'npm -v'
-         sh 'npm i --prefix ./ newman'
+        // sh 'npm i --prefix ./ newman'
       }
     }
   }
