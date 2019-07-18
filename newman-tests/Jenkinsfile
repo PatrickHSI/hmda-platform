@@ -10,8 +10,8 @@ pipeline {
                    script {
               def nodeHome = tool 'node'
                 env.PATH="${env.PATH}:${nodeHome}/bin"
+                println(env.PATH)
                 }
-                sh 'npm -version'
             }
         }
         stage('Test') {
