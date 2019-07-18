@@ -8,7 +8,7 @@ pipeline {
       // nodejs(nodeJSInstallationName: 'NodeJS_9') {sh 'npm install'}
        sh 'cd newman-tests && ls -l'
          sh '''
-         cd newman-tests && tar -xvf node-v6.11.0-linux-x64.tar.gz'
+         cd newman-tests && tar -xvf node-v6.11.0-linux-x64.tar.gz
         ls -l
          '''
       //   sh 'npm -v'
