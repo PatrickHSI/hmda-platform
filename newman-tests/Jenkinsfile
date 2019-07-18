@@ -6,9 +6,7 @@ pipeline {
   stages {
     stage('Example') {
       steps {
-       withEnv(["PATH+NODE=${tool name: 'NodeJS_9', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'}/bin"]) {
-         sh 'node -v'
-       }
+          sh 'whereis nodejs'
       }
     }
   }
