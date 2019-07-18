@@ -1,11 +1,16 @@
+#!groovy
 pipeline {
   agent any
-
+  environment{
+  env.NODE_HOME="${tool 'node'}"
+  env.PATH="${env.NODE_HOME}/bin:${env.PATH}"
+  sh 'npm -version'
+  }
     stages {
         stage('Build') {
             steps {
              echo 'Building..'
-             sh 'cd /var/jenkins_home/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/node/bin && node -v'
+             sh 'npm -version'
 
             }
         }
