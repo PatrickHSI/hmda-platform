@@ -3,13 +3,14 @@ pipeline {
 
 
   stages {
-       agent {
-          dockerfile {
-            filename "newman-tests/Dockerfile"
-          }
-        }
+
 
     stage('Test') {
+           agent {
+              dockerfile {
+                filename "newman-tests/Dockerfile"
+              }
+            }
       steps {
            sh 'docker'
       }
