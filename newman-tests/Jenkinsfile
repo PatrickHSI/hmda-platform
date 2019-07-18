@@ -11,6 +11,7 @@ pipeline {
                       script {
                                     env.NODE_HOME="${tool 'node'}"
                                       env.PATH="${env.NODE_HOME}/bin:${env.PATH}"
+                                      alias nosw= "${env.NODE_HOME}/bin"
                                 }
 
                                  echo "${env.NODE_HOME}"
