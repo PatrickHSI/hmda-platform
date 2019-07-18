@@ -1,9 +1,14 @@
 pipeline {
-    agent {
-        docker { image 'node:8-alpine' }
-    }
+    agent none
+
 
   stages {
+       agent {
+          dockerfile {
+            filename "newman-tests/Dockerfile"
+          }
+        }
+
     stage('Test') {
       steps {
            sh 'docker'
