@@ -6,7 +6,7 @@ pipeline {
             steps {
                 echo 'Building..'
              nodejs(nodeJSInstallationName: 'node') {
-               sh 'npm -version'
+               sh '/var/lib/jenkins/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/node/npm install -version'
              }
             }
         }
