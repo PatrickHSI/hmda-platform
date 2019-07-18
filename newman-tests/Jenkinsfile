@@ -2,9 +2,8 @@
 pipeline {
   agent any
   environment{
-  env.NODE_HOME="${tool 'node'}"
-  env.PATH="${env.NODE_HOME}/bin:${env.PATH}"
-  sh 'npm -version'
+  NODE_HOME="${tool 'node'}"
+  PATH="${NODE_HOME}/bin:${PATH}"
   }
     stages {
         stage('Build') {
