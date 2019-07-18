@@ -1,12 +1,14 @@
 pipeline {
   // Assign to docker slave(s) label, could also be 'any'
-dockerfile {
+  agent {
+  dockerfile {
 
-filename ‘newman-tests/Dockerfile’
+  filename ‘newman-tests/Dockerfile’
 
-label ‘docker’
+  label ‘docker’
 
-}
+  }
+  }
 
   stages {
     stage('Test') {
