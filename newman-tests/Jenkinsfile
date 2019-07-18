@@ -1,29 +1,18 @@
-podTemplate(label: 'buildDockerContainer', containers: [
-  containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
-  containerTemplate(name: 'helm', image: 'lachlanevenson/k8s-helm', ttyEnabled: true, command: 'cat')
-],
-volumes: [
-  hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-]) {
-   node('buildDockerContainer') {
-     sh "env | sort"
+pipeline {
+    agent none
 
-    stage('Build And Publish Docker Image') {
-      container('docker') {
-        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub',
-            usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
-            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'hmda-platform-jenkins-service',
-              usernameVariable: 'DTR_USER', passwordVariable: 'DTR_PASSWORD']]) {
-              withCredentials([string(credentialsId: 'internal-docker-registry', variable: 'DOCKER_REGISTRY_URL')]){
-               sh "docker -version"
-                }
+
+  stages {
+
+    stage('Test') {
+           agent {
+              dockerfile {
+                filename "newman-tests/Dockerfile"
               }
             }
-          }
-        }
+      steps {
+           sh 'ls'
       }
-
-
+    }
   }
-
 }
