@@ -1,19 +1,12 @@
 pipeline {
-  // Assign to docker slave(s) label, could also be 'any'
-  agent {
-  dockerfile {
-
-  filename ‘newman-tests/Dockerfile’
-
-  label ‘docker’
-
-  }
-  }
+    agent {
+        docker { image 'node:8-alpine' }
+    }
 
   stages {
     stage('Test') {
       steps {
-           sh 'docker -version'
+           sh 'docker'
       }
     }
   }
