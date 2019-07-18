@@ -12,7 +12,7 @@ pipeline {
               }
             }
       steps {
-           sh 'docker'
+           sh 'ls'
       }
     }
   }
