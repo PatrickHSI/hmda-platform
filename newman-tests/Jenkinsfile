@@ -6,7 +6,7 @@ pipeline {
   stages {
     stage('Example') {
       steps {
-        sh 'ln -s /usr/bin/nodejs /usr/bin/node'
+       // sh 'ln -s /usr/bin/nodejs /usr/bin/node'
         sh 'node -v'
       }
     }
