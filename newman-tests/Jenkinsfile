@@ -9,11 +9,7 @@ pipeline {
              echo $PATH
 
              cd /var/jenkins_home/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/node/bin
-             ls -all
-             ./node --version
 
-             node --version
-             npm --version
              }
             }
         }
