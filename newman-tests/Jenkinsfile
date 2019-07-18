@@ -1,11 +1,13 @@
 pipeline {
   agent any
 
- 
+  tools {nodejs "NodeJS_9"}
+
   stages {
-    stage('Example') {
+    stage('Test') {
       steps {
-        sh "/usr/local/bin/npm install"
+        sh "node -v"
+         sh "npm -v"
       }
     }
   }
