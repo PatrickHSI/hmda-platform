@@ -11,7 +11,7 @@ pipeline {
              sh '''
               NODE_HOME="${tool 'node'}"
                PATH="${NODE_HOME}/bin:${PATH}"
-             npm -version'
+             node -v'
 
             }
         }
