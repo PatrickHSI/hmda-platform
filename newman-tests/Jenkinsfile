@@ -1,9 +1,19 @@
 pipeline {
-    agent any
-
+  // Assign to docker slave(s) label, could also be 'any'
+  agent {
+    label 'docker'
+  }
 
   stages {
     stage('Test') {
+     agent {
+            docker {
+              // Set both label and image
+              label 'docker'
+              image 'node:7-alpine'
+              args '--name docker-node' // list any args
+            }
+          }
       steps {
            sh 'docker pull postman/newman'
       }
