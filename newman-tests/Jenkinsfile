@@ -13,7 +13,7 @@ pipeline {
                                     env.NODE_HOME="${tool 'node'}"
                                       env.PATH="${env.NODE_HOME}/bin:${env.PATH}"
                                 }
-                                 sh " alias node= "${env.NODE_HOME}/bin""
+                                 sh " alias node= "${env.NODE_HOME}\/bin""
                                  echo "${env.NODE_HOME}"
                                  sh "npm -version"
             }
