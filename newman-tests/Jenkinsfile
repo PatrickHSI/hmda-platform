@@ -1,16 +1,13 @@
 pipeline {
   agent any
-environment{
 
-
-PATH="{$PATH}:/var/lib/jenkins/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/bin"
-
-}
     stages {
         stage('Build') {
             steps {
                 echo 'Building..'
-                sh 'npm -version'
+             nodejs(nodeJSInstallationName: 'node') {
+               sh 'npm -version'
+             }
             }
         }
         stage('Test') {
