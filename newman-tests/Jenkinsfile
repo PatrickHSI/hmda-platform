@@ -8,7 +8,7 @@ pipeline {
             steps {
                 echo 'Building..'
                    script {
-              def nodeHome = tool 'nodejs5'
+              def nodeHome = tool 'nodejs'
                 env.PATH="${env.PATH}:${nodeHome}/bin"
                 }
                 sh 'npm -version'
