@@ -8,7 +8,7 @@ volumes: [
 
      def repo = checkout scm
          def gitBranch = repo.GIT_BRANCH
-       
+
 
     stage('Build') {
       container('docker') {
@@ -19,7 +19,7 @@ volumes: [
               withCredentials([string(credentialsId: 'internal-docker-registry', variable: 'DOCKER_REGISTRY_URL')]){
                 sh "docker -v"
                 sh "docker pull postman/newman;"
-                sh "ls -l"
+                sh "cd newman-tests && ls -l"
               }
             }
           }
