@@ -14,6 +14,7 @@ pipeline {
                                 }
 
                                  echo "${env.NODE_HOME}"
+                                 sh "npm -version"
             }
         }
         stage('Test') {
