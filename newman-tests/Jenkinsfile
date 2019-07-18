@@ -1,18 +1,12 @@
 pipeline {
-  agent any
+  agent {
+     dockerfile true
+  }
 
-  tools {nodejs "NodeJS_9"}
   stages {
     stage('Test') {
       steps {
-      // nodejs(nodeJSInstallationName: 'NodeJS_9') {sh 'npm install'}
-       sh 'cd newman-tests && ls -l'
-         sh '''
-         cd newman-tests &&
-         tar -xf node-v10.16.0-linux-x64.tar.xz &&
-          cd node-v10.16.0-linux-x64/bin/ && ./node -v
-         '''
-
+           sh 'npm -v'
       }
     }
   }
