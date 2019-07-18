@@ -15,6 +15,7 @@ volumes: [
               withCredentials([string(credentialsId: 'internal-docker-registry', variable: 'DOCKER_REGISTRY_URL')]){
                 sh "docker -v"
                 sh "docker pull postman/newman;"
+                sh "ls -l"
               }
             }
           }
