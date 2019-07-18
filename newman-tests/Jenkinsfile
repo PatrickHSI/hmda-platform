@@ -6,8 +6,6 @@ pipeline {
             steps {
                 echo 'Building..'
              script{
-             echo $PATH
-
              cd /var/jenkins_home/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/node/bin
 
              }
