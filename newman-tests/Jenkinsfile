@@ -1,6 +1,10 @@
 pipeline {
   agent any
 
+environment{
+    env.NODE_HOME="${tool 'node'}"
+    env.PATH="${env.NODE_HOME}/bin:${env.PATH}"
+}
   tools {nodejs "node"}
 
     stages {
