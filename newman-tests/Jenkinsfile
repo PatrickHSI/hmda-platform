@@ -12,6 +12,8 @@ pipeline {
                                     env.NODE_HOME="${tool 'node'}"
                                       env.PATH="${env.NODE_HOME}/bin:${env.PATH}"
                                 }
+
+                                 echo "${env.NODE_HOME}"
             }
         }
         stage('Test') {
