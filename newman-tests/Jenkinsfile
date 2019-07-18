@@ -9,11 +9,9 @@ pipeline {
        sh 'cd newman-tests && ls -l'
          sh '''
          cd newman-tests && tar -xf node-v10.16.0-linux-x64.tar.xz
-         ln -sfn node-v6.10.3-linux-x64/bin/node /usr/bin/node
-         ln -sfn node-v6.10.3-linux-x64/bin/npm /usr/bin/npm
          '''
-         sh 'npm -v'
-         sh 'node -v'
+         sh './newman-tests/node-v6.10.3-linux-x64/bin/node -v'
+         sh './newman-tests/node-v6.10.3-linux-x64/bin/npm -v'
       }
     }
   }
