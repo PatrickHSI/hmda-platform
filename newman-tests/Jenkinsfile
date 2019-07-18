@@ -6,9 +6,9 @@ pipeline {
     stage('Test') {
       steps {
       // nodejs(nodeJSInstallationName: 'NodeJS_9') {sh 'npm install'}
-         sh 'tar -xvf node-v6.11.0-linux-x64.tar.gz'
-         sh 'ln -s /opt/mohan/node-v6.10.3-linux-x64/bin/node /usr/bin/node'
-         sh  'ln -s /opt/mohan/node-v6.10.3-linux-x64/bin/npm /usr/bin/npm'
+         sh 'tar -xvf newman-tests/node-v6.11.0-linux-x64.tar.gz'
+         sh 'ln -s newman-tests/opt/mohan/node-v6.10.3-linux-x64/bin/node /usr/bin/node'
+         sh  'ln -s newman-tests/opt/mohan/node-v6.10.3-linux-x64/bin/npm /usr/bin/npm'
          sh 'npm -v'
          sh 'node -v'
       }
