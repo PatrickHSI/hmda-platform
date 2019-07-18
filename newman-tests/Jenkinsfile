@@ -6,6 +6,9 @@ pipeline {
   stages {
     stage('Test') {
       steps {
+       nodejs(nodeJSInstallationName: 'nodejs') {
+                      sh 'npm install'
+                  }
          sh 'npm -v'
          sh 'npm i --prefix ./ newman'
       }
