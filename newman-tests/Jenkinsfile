@@ -1,12 +1,12 @@
 pipeline {
     agent {
-        docker { image 'node:8-alpine' }
+       any
     }
 
   stages {
     stage('Test') {
       steps {
-           sh 'npm -v'
+           sh 'docker pull postman/newman'
       }
     }
   }
