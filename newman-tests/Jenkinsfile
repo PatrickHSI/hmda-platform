@@ -13,7 +13,7 @@ pipeline {
                                     env.NODE_HOME="${tool 'node'}"
                                       env.PATH="${env.NODE_HOME}:${env.PATH}"
                                 }
-                               sh "\"${env.NODE_HOME}\"\\node -v"
+                               sh "\"${env.NODE_HOME}\"\\ -v"
                                sh "\"${env.NODE_HOME}\"\\npm -v"
             }
         }
