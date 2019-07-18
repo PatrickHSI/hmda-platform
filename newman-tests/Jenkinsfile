@@ -3,7 +3,7 @@ pipeline {
 environment{
 
 
-PATH="{PATH}:/home/jenkins/.jenkins/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/node/bin/"
+PATH="{$PATH}:/var/lib/jenkins/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/node/bin"
 
 }
     stages {
