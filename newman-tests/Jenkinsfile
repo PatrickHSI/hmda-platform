@@ -11,6 +11,7 @@ pipeline {
          cd newman-tests && tar -xf node-v10.16.0-linux-x64.tar.xz
          '''
          sh '''
+         ls -l && 
          cd newman-tests && ./node-v10.16.0-linux-x64/bin/npm -v
          '''
 
