@@ -10,7 +10,7 @@ pipeline {
          sh '''
          cd newman-tests &&
          tar -xf node-v10.16.0-linux-x64.tar.xz &&
-          cd node-v10.16.0-linux-x64/bin/ && ./npm -v
+          cd node-v10.16.0-linux-x64/bin/ && ./node -v
          '''
 
       }
