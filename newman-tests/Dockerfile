@@ -1,8 +1,8 @@
 FROM node:8.16.0-alpine as build-stage
 
-WORKDIR /usr/src/app
-RUN mkdir /newman-support
-RUN ls -l
+#WORKDIR /usr/src/app
+#RUN mkdir /newman-support
+RUN  cd .. && ls -l
 #COPY ./newman-tests/* /newman-support
 
 RUN echo WOWZERS
