@@ -20,6 +20,7 @@ volumes: [
                 sh "docker -v"
                 sh "docker pull postman/newman;"
                 sh "cd newman-tests && docker build . -t trial:test"
+                sh "docker run trial:test"
               }
             }
           }
