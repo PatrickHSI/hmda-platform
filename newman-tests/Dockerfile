@@ -1,4 +1,6 @@
 FROM node:8.16.0-alpine as build-stage
+
+WORKDIR /usr/src/app
 RUN mkdir /newman-support
 RUN ls -l
 #COPY ./newman-tests/* /newman-support
