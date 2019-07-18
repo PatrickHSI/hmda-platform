@@ -1,17 +1,17 @@
 pipeline {
   agent any
 
-environment{
-    env.NODE_HOME="${tool 'node'}"
-    env.PATH="${env.NODE_HOME}/bin:${env.PATH}"
-}
+
   tools {nodejs "node"}
 
     stages {
         stage('Build') {
             steps {
                 echo 'Building..'
-                sh 'npm -version'
+                      script {
+                                    env.NODE_HOME="${tool 'node'}"
+                                      env.PATH="${env.NODE_HOME}/bin:${env.PATH}"
+                                }
             }
         }
         stage('Test') {
