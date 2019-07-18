@@ -6,6 +6,10 @@ volumes: [
    node('buildDockerContainer') {
      sh "env | sort"
 
+     def repo = checkout scm
+         def gitBranch = repo.GIT_BRANCH
+       
+
     stage('Build') {
       container('docker') {
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub',
