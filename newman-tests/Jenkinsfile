@@ -1,24 +1,13 @@
-#!groovy
 pipeline {
   agent any
 
-    stages {
-        stage('Build') {
-            steps {
-             echo 'Building..'
-              sh 'npm -v'
+  tools {nodejs "node"}
 
-            }
-        }
-        stage('Test') {
-            steps {
-                echo 'Testing..'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
-            }
-        }
+  stages {
+    stage('Example') {
+      steps {
+        sh 'npm config ls'
+      }
     }
+  }
 }
