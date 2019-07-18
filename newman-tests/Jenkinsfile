@@ -2,7 +2,9 @@ pipeline {
   agent any
 
   tools {nodejs "NodeJS_9"}
-
+environment {
+PATH="${PATH}:/usr/local/bin/npm"
+}
   stages {
     stage('Test') {
       steps {
