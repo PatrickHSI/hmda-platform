@@ -10,7 +10,7 @@ PATH="{PATH}:/home/jenkins/.jenkins/tools/jenkins.plugins.nodejs.tools.NodeJSIns
         stage('Build') {
             steps {
                 echo 'Building..'
-                sh 'npm'
+                sh 'npm -version'
             }
         }
         stage('Test') {
