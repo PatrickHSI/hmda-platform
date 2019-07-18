@@ -8,7 +8,7 @@ pipeline {
              script{
              echo $PATH
 
-             cd /var/jenkins_home/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/latest/bin
+             cd /var/jenkins_home/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/node/bin
              ls -all
              ./node --version
 
