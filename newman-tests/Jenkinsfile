@@ -1,7 +1,5 @@
-#!/bin/bash
 pipeline {
   agent any
-
 
   tools {nodejs "node"}
 
@@ -9,12 +7,11 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building..'
-                      script {
-                                    env.NODE_HOME="${tool 'node'}"
-                                     env.PATH="${env.NODE_HOME}:${env.PATH}"
-                                     ls  env.NODE_HOME
-                                }
- 
+                   script {
+              def nodeHome = tool 'node'
+                env.PATH="${env.PATH}:${nodeHome}/bin"
+                println(env.PATH)
+                }
             }
         }
         stage('Test') {
