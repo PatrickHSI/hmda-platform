@@ -2,14 +2,16 @@
 pipeline {
   agent any
   environment{
-  NODE_HOME="${tool 'node'}"
-  PATH="${NODE_HOME}/bin:${PATH}"
+
   }
     stages {
         stage('Build') {
             steps {
              echo 'Building..'
-             sh 'npm -version'
+             sh '''
+              NODE_HOME="${tool 'node'}"
+               PATH="${NODE_HOME}/bin:${PATH}"
+             npm -version'
 
             }
         }
