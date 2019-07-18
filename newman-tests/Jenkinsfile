@@ -6,10 +6,7 @@ pipeline {
         stage('Build') {
             steps {
              echo 'Building..'
-             sh '''
-              NODE_HOME="${tool 'node'}"
-              PATH="${NODE_HOME}/bin:${PATH}"'''
-              sh 'node -v'
+              sh 'npm -v'
 
             }
         }
