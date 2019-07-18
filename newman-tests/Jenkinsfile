@@ -5,8 +5,8 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building..'
-             script{
-             cd /var/jenkins_home/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/node/bin
+
+             sh 'cd /var/jenkins_home/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/node/bin'
 
              }
             }
