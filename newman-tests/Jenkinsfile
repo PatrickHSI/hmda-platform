@@ -11,9 +11,8 @@ pipeline {
                 echo 'Building..'
                       script {
                                     env.NODE_HOME="${tool 'node'}"
-                                      env.PATH="${env.NODE_HOME}/bin:${env.PATH}"
+                                      env.PATH="${env.NODE_HOME}:${env.PATH}"
                                 }
-                                 sh " alias node= "${env.NODE_HOME}""
                                  echo "${env.NODE_HOME}"
                                  sh "npm -version"
             }
