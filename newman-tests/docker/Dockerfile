@@ -11,7 +11,7 @@ COPY hmda-filing/*  scripts/hmda-filing/
 COPY newman-pak/newman-4.5.1.tgz  .
 
 RUN  ls -l
-RUN  cd hmda-filing &&  ls -l
+RUN  cd scripts/hmda-filing &&  ls -l
 RUN echo WOWZERS
 #RUN npm install newman-4.5.1.tgz
 #RUN newman -v
