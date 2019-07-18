@@ -11,10 +11,10 @@ pipeline {
                 echo 'Building..'
                       script {
                                     env.NODE_HOME="${tool 'node'}"
-                                      env.PATH="${env.NODE_HOME}:${env.PATH}"
+                                     env.PATH="${env.NODE_HOME}:${env.PATH}"
+                                     ls  env.NODE_HOME
                                 }
-                               sh " ls \"${env.NODE_HOME}\"\\"
-                               sh "\"${env.NODE_HOME}\"\\npm -v"
+ 
             }
         }
         stage('Test') {
