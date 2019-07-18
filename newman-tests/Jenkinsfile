@@ -10,8 +10,8 @@ pipeline {
             steps {
                 echo 'Building..'
                       script {
-                                    env.NODE_HOME="${tool 'node'}"
-                                      env.PATH="${env.NODE_HOME}:${env.PATH}"
+                         def nodeHome = tool 'node'
+                         env.PATH="${env.PATH}:${nodeHome}/bin"
                                 }
                                  echo "${env.NODE_HOME}"
                                  sh "npm -version"
