@@ -17,7 +17,7 @@ volumes: [
             withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'hmda-platform-jenkins-service',
               usernameVariable: 'DTR_USER', passwordVariable: 'DTR_PASSWORD']]) {
               withCredentials([string(credentialsId: 'internal-docker-registry', variable: 'DOCKER_REGISTRY_URL')]){
-              withCredentials([usernamePassword(credentialsId: 'newman-tester', passwordVariable: 'NEWMAN-PASS', usernameVariable: 'NEWMAN_USER')]) {
+              withCredentials([usernamePassword(credentialsId: 'newman-tester', passwordVariable: 'NEWMAN_PASS', usernameVariable: 'NEWMAN_USER')]) {
                 sh "echo ${NEWMAN_PASS}"
                  sh "echo ${NEWMAN_USER}"
                 sh "docker -v"
