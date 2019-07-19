@@ -17,15 +17,14 @@ volumes: [
             withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'hmda-platform-jenkins-service',
               usernameVariable: 'DTR_USER', passwordVariable: 'DTR_PASSWORD']]) {
               withCredentials([string(credentialsId: 'internal-docker-registry', variable: 'DOCKER_REGISTRY_URL')]){
-              withCredentials([usernamePassword(credentialsId: 'newman-tester', passwordVariable: 'NEWMAN_PASS', usernameVariable: 'NEWMAN_USER')]) {
-                 withCredentials([string(credentialsId: 'hmda-dev-filings', variable: 'HMDA_DEV_FILING') {
-                              withCredentials([string(credentialsId: 'hmda-dev-institutions', variable: 'HMDA_DEV_API') {
-                sh "echo $NEWMAN_USER"
+              withCredentials([usernamePassword(credentialsId: 'newman-tester', passwordVariable: 'newman-pass', usernameVariable: 'newman-user')]) {
+                sh "echo ${newman-pass}"
+                 sh "echo ${newman-user}"
                 sh "docker -v"
                 sh "docker pull postman/newman;"
                 sh "cd newman-tests && docker build . -t trial:test -f docker/Dockerfile"
                 sh "docker run trial:test"
-                }}}
+                }
               }
             }
           }
