@@ -22,7 +22,7 @@ volumes: [
                  sh "echo ${NEWMAN_USER}"
                 sh "docker -v"
                 sh "docker pull postman/newman;"
-                sh "cd newman-tests && docker build--build-arg a_user=1234 . -t trial:test -f docker/Dockerfile  --build-arg pass=${NEWMAN_PASS}"
+                sh "cd newman-tests && docker build --build-arg a_user=1234 . -t trial:test -f docker/Dockerfile  --build-arg pass=${NEWMAN_PASS}"
                 sh "docker run trial:test"
                 }
               }
