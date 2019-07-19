@@ -13,4 +13,4 @@ RUN  ls -l
 RUN npm i  --prefix ./ newman-4.5.1.tgz
 RUN ./node_modules/.bin/newman -v
 
-RUN ./node_modules/.bin/newman run scripts/hmda-filing/hmda-filing-api-test.json -d scripts/hmda-filing/hmda-filing-api-config.json
+RUN ./node_modules/.bin/newman run scripts/hmda-filing/hmda-filing-api-test.json -d scripts/hmda-filing/hmda-filing-api-config.json --env-var user="admin" --env-var password="admin123"
