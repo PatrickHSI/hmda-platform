@@ -1,5 +1,4 @@
 #!/bin/bash
-
   IP=$(curl -X POST \
   https://hmda4.demo.cfpb.gov/auth/realms/hmda2/protocol/openid-connect/token \
   -H 'cache-control: no-cache' \
