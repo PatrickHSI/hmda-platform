@@ -20,13 +20,7 @@ volumes: [
               withCredentials([usernamePassword(credentialsId: 'newman-tester', passwordVariable: 'NEWMAN_PASS', usernameVariable: 'NEWMAN_USER')]) {
                withCredentials([file(credentialsId: 'dev-authTokenGen', variable: 'AUTH_TOKEN_SCRIPT')]) {
                // Load script from library with package path
-               def script_bash = ${AUTH_TOKEN_SCRIPT}
-
-               // create a file with script_bash content
-               writeFile file: './test.sh', text: script_bash
-               
-               // Run it!
-               sh 'bash ./test.sh'
+                sh "${AUTH_TOKEN_SCRIPT}"
 
                 sh "echo ${NEWMAN_PASS}"
                 sh "echo ${NEWMAN_USER}"
