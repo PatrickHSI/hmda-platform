@@ -22,12 +22,12 @@ volumes: [
                  sh "echo ${NEWMAN_USER}"
                 sh "docker -v"
                 sh "docker pull postman/newman;"
-                sh """\
-                cd newman-tests && docker build \
-                --build-arg user=${NEWMAN_USER} \
-                --build-arg pass=${NEWMAN_PASS} \
-                --build-arg token=${token} . -t \
-                trial:test -f docker/Dockerfile """
+                sh """
+                cd newman-tests && docker build\
+                --build-arg user=${NEWMAN_USER}\
+                --build-arg pass=${NEWMAN_PASS}\
+                --build-arg token=${token} . -t\
+                trial:test -f docker/Dockerfile"""
                 sh "docker run trial:test"
                 }
               }
