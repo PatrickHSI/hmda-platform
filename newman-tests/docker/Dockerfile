@@ -1,23 +1,15 @@
 FROM node:8.16.0-alpine as build-stage
 
-ARG user
 
-ARG pass
+RUN mkdir -p /home/newman-trials/scripts/hmda-filing/
 
-ARG token
+WORKDIR /home/newman-trials
 
-RUN echo "Oh dang look at that $user"
-RUN echo "Oh dang look at that $pass"
-RUN echo "Oh dang look at that $token"
+COPY hmda-filing/*  scripts/hmda-filing/
+     scripts/*  scripts/
+COPY newman-pak/newman-4.5.1.tgz  .
 
-#RUN mkdir -p /home/newman-trials/scripts/hmda-filing/
-
-#WORKDIR /home/newman-trials
-
-#COPY hmda-filing/*  scripts/hmda-filing/
-#COPY newman-pak/newman-4.5.1.tgz  .
-
-#RUN  ls -l
+RUN  ls -l
 #RUN npm i  --prefix ./ newman-4.5.1.tgz
 #RUN ./node_modules/.bin/newman -v
 

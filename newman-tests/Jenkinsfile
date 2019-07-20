@@ -20,8 +20,8 @@ volumes: [
               withCredentials([usernamePassword(credentialsId: 'newman-tester', passwordVariable: 'NEWMAN_PASS', usernameVariable: 'NEWMAN_USER')]) {
                withCredentials([file(credentialsId: 'dev-authTokenGen', variable: 'AUTH_TOKEN_SCRIPT')]) {
                // Load script from library with package path
-                sh "${AUTH_TOKEN_SCRIPT}"
-
+                sh "cp ${AUTH_TOKEN_SCRIPT} newman-tests/scripts/authTokenGen.sh"
+                sh "cat newman-tests/scripts/authTokenGen.sh "
                 sh "echo ${NEWMAN_PASS}"
                 sh "echo ${NEWMAN_USER}"
                 sh "docker -v"
