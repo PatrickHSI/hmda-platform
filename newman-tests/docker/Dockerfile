@@ -1,6 +1,10 @@
-FROM node:8.16.0-alpine as build-stage
 ARG USER
-RUN "echo $USER"
+FROM node:8.16.0-alpine as build-stage
+
+
+ARG USER
+
+RUN echo "-> $USER"               #output: 5
 
 #RUN mkdir -p /home/newman-trials/scripts/hmda-filing/
 
