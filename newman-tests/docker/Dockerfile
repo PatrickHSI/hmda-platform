@@ -1,10 +1,14 @@
-ARG USER
 FROM node:8.16.0-alpine as build-stage
 
+ARG user
 
-ARG USER
+ARG pass
 
-RUN echo "-> $USER"               #output: 5
+ARG token
+
+RUN echo "Oh dang look at that $user"
+RUN echo "Oh dang look at that $pass"
+RUN echo "Oh dang look at that $token"
 
 #RUN mkdir -p /home/newman-trials/scripts/hmda-filing/
 
