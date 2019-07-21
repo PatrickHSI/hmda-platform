@@ -10,7 +10,7 @@ COPY scripts/*  scripts/
 COPY newman-pak/newman-4.5.1.tgz  .
 
 RUN  ls -l
-RUN ["chmod", "+x", "/scripts/authTokenGen.sh"]
+RUN ["chmod", "+x", "scripts/authTokenGen.sh"]
 #RUN npm i  --prefix ./ newman-4.5.1.tgz
 #RUN ./node_modules/.bin/newman -v
 
