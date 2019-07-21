@@ -1,3 +1,7 @@
+FROM mhart/alpine-node:8
+
+RUN apk add --no-cache curl
+
 FROM node:8.16.0-alpine as build-stage
 
 RUN apt-get update; apt-get install curl
