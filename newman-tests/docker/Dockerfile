@@ -1,4 +1,4 @@
-FROM node:8.16.0-alpine as build-stage
+FROM node:8.16.0-jessie as build-stage
 
 RUN mkdir -p /home/newman-trials/scripts/hmda-filing/
 
