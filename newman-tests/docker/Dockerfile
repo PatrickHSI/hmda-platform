@@ -1,6 +1,8 @@
-FROM openjdk:8-jre-alpine
+FROM alpine:3.8
 
-RUN apk --no-cache add curl
+RUN apk add --no-cache curl
+
+ENTRYPOINT ["/usr/bin/curl"]
 
 #FROM node:8.16.0-alpine as build-stage
 
