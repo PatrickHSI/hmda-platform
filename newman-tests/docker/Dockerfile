@@ -1,5 +1,6 @@
 FROM node:8.16.0-alpine as build-stage
 
+RUN apt-get update; apt-get install curl
 
 RUN mkdir -p /home/newman-trials/scripts/hmda-filing/
 
