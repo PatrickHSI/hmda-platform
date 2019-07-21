@@ -1,23 +1,18 @@
-FROM alpine:3.8
+FROM node:8.16.0-alpine as build-stage
 
-RUN wget
-#FROM node:8.16.0-alpine as build-stage
+RUN apt-get update; apt-get install curl
 
-#RUN apk --no-cache add curl
+RUN mkdir -p /home/newman-trials/scripts/hmda-filing/
 
-#RUN apt-get update; apt-get install curl
+WORKDIR /home/newman-trials
 
-#RUN mkdir -p /home/newman-trials/scripts/hmda-filing/
+COPY hmda-filing/*  scripts/hmda-filing/
+COPY scripts/*  scripts/
+COPY newman-pak/newman-4.5.1.tgz  .
 
-#WORKDIR /home/newman-trials
+RUN ["chmod", "u+x", "scripts/authTokenGen.sh"]
 
-#COPY hmda-filing/*  scripts/hmda-filing/
-#COPY scripts/*  scripts/
-#COPY newman-pak/newman-4.5.1.tgz  .
-
-#RUN ["chmod", "u+x", "scripts/authTokenGen.sh"]
-
-#RUN ./scripts/authTokenGen.sh
+RUN ./scripts/authTokenGen.sh
 
 #RUN npm i  --prefix ./ newman-4.5.1.tgz
 #RUN ./node_modules/.bin/newman -v
