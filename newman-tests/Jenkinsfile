@@ -9,31 +9,14 @@ volumes: [
      def repo = checkout scm
          def gitBranch = repo.GIT_BRANCH
 
-     stage('Script'){
-       withCredentials([file(credentialsId: 'dev-authTokenGen', variable: 'AUTH_TOKEN_SCRIPT')]) {
-                    // Load script from library with package path
-                     sh "cp ${AUTH_TOKEN_SCRIPT} newman-tests/scripts/authTokenGen.sh"
-                      sh "cat newman-tests/scripts/authTokenGen.sh"
-     }
-     }
+
     stage('Build') {
       container('docker') {
-        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub',
-            usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
-            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'hmda-platform-jenkins-service',
-              usernameVariable: 'DTR_USER', passwordVariable: 'DTR_PASSWORD']]) {
-              withCredentials([string(credentialsId: 'internal-docker-registry', variable: 'DOCKER_REGISTRY_URL')]){
-              withCredentials([usernamePassword(credentialsId: 'newman-tester', passwordVariable: 'NEWMAN_PASS', usernameVariable: 'NEWMAN_USER')]) {
-                sh "echo ${NEWMAN_PASS}"
-                sh "echo ${NEWMAN_USER}"
-                sh "docker -v"
-                sh "docker pull postman/newman;"
+                 withCredentials([file(credentialsId: 'dev-authTokenGen', variable: 'AUTH_TOKEN_SCRIPT')]) {
+                sh "cp ${AUTH_TOKEN_SCRIPT} newman-tests/scripts/authTokenGen.sh"
                 sh " cd newman-tests && docker build  . -t trial:test -f docker/Dockerfile"
                 sh "docker run trial:test"
-                }
-              }
-            }
-          }
+                 }
         }
       }
   }

@@ -10,12 +10,9 @@ COPY newman-pak/newman-4.5.1.tgz  .
 
 RUN ["chmod", "u+x", "scripts/authTokenGen.sh"]
 
-RUN   sed -i "s|HOST4|hmda4|g" scripts/authTokenGen.sh
-RUN   sed -i "s|HOST2|hmda2|g" scripts/authTokenGen.sh
-RUN   sed -i "s|FIELDP|password|g" scripts/authTokenGen.sh
-
 RUN ./scripts/authTokenGen.sh
 
+RUN  echo $IP
 #RUN npm i  --prefix ./ newman-4.5.1.tgz
 #RUN ./node_modules/.bin/newman -v
 
