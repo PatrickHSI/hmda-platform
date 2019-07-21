@@ -1,6 +1,6 @@
 FROM alpine:3.8
 
-RUN apt-get update && apt-get -y install curl
+RUN which curl
 
 #FROM node:8.16.0-alpine as build-stage
 
