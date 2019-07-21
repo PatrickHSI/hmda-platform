@@ -1,7 +1,9 @@
 FROM alpine:3.8
 
-RUN which curl
-
+RUN apk add --update libzip-dev curl-dev &&\
+    docker-php-ext-install curl && \
+    apk del gcc g++ &&\
+    rm -rf /var/cache/apk/*
 #FROM node:8.16.0-alpine as build-stage
 
 #RUN apk --no-cache add curl
