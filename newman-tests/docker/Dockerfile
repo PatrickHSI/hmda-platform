@@ -1,6 +1,10 @@
-FROM node:8.16.0-alpine as build-stage
+FROM openjdk:8-jre-alpine
 
-RUN apk --no-cache add curl 
+RUN apk --no-cache add curl
+
+#FROM node:8.16.0-alpine as build-stage
+
+#RUN apk --no-cache add curl
 
 #RUN apt-get update; apt-get install curl
 
