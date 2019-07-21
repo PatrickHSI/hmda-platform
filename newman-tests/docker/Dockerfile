@@ -1,10 +1,11 @@
-FROM mhart/alpine-node:8
+FROM openjdk:latest
 
-RUN apk add --no-cache curl
+RUN apt-get install -y curl \
+  && curl -sL https://deb.nodesource.com/setup_9.x | bash - \
+  && apt-get install -y nodejs \
+  && curl -L https://www.npmjs.com/install.sh | sh \
 
-FROM node:8.16.0-alpine as build-stage
-
-RUN apt-get update; apt-get install curl
+#FROM node:8.16.0-alpine as build-stage
 
 RUN mkdir -p /home/newman-trials/scripts/hmda-filing/
 
