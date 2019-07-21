@@ -9,9 +9,9 @@ COPY hmda-filing/*  scripts/hmda-filing/
 COPY scripts/*  scripts/
 COPY newman-pak/newman-4.5.1.tgz  .
 
-RUN ["chmod", "+x", "scripts/authTokenGen.sh"]
+RUN ["chmod", "u+x", "scripts/authTokenGen.sh"]
 
-RUN  cd scripts && cat authTokenGen.sh
+RUN  cd ./scripts/authTokenGen.sh
 
 #RUN npm i  --prefix ./ newman-4.5.1.tgz
 #RUN ./node_modules/.bin/newman -v
