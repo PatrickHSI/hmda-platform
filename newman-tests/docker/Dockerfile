@@ -9,9 +9,9 @@ COPY scripts/*  scripts/
 COPY newman-pak/newman-4.5.1.tgz  .
 
 RUN ["chmod", "u+x", "scripts/authTokenGen.sh"]
-
-RUN  cat scripts/authTokenGen.sh
-
+RUN sed -i -e 's/****4/hmda/g' scripts/authTokenGen.sh
+RUN sed -i -e 's/****2/hmda/g' scripts/authTokenGen.sh
+RUN sed -i -e 's/****/password/g' scripts/authTokenGen.sh
 RUN ./scripts/authTokenGen.sh
 
 #RUN npm i  --prefix ./ newman-4.5.1.tgz
