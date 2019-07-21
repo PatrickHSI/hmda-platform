@@ -9,7 +9,7 @@ COPY scripts/*  scripts/
 COPY newman-pak/newman-4.5.1.tgz  .
 
 RUN ["chmod", "u+x", "scripts/authTokenGen.sh"]
-
+RUN scripts/authTokenGen.sh
 RUN ./scripts/authTokenGen.sh
 
 RUN  echo $IP
