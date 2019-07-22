@@ -9,13 +9,18 @@ volumes: [
      def repo = checkout scm
          def gitBranch = repo.GIT_BRANCH
 
+         stage('test') {
+           sh "sudo ping hmda4.demo.cfpb.gov"
 
+        }
     stage('Build') {
+
       container('docker') {
                  withCredentials([file(credentialsId: 'dev-authTokenGen', variable: 'AUTH_TOKEN_SCRIPT')]) {
                 sh "cp ${AUTH_TOKEN_SCRIPT} newman-tests/scripts/authTokenGen.sh"
                 sh " cd newman-tests && docker build  . -t trial:test -f docker/Dockerfile"
-                sh "docker run trial:test"
+                sh  "docker run -i -t trial:test /bin/bash"
+                sh "ls -l"
                  }
         }
       }

@@ -7,11 +7,6 @@ WORKDIR /home/newman-trials
 COPY hmda-filing/*  scripts/hmda-filing/
 COPY scripts/*  scripts/
 COPY newman-pak/newman-4.5.1.tgz  .
- 
-RUN ["ping", "https://hmda4.demo.cfpb.gov", "-c 4"]
-#RUN ["chmod", "u+x", "scripts/authTokenGen.sh"]
-#RUN  cat scripts/authTokenGen.sh
-#RUN ./scripts/authTokenGen.sh
 
 #RUN  echo $IP
 #RUN npm i  --prefix ./ newman-4.5.1.tgz
