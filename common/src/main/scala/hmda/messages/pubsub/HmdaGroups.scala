@@ -11,4 +11,6 @@ object HmdaGroups {
   val analyticsGroup   = config.getString("hmda.kafka.groups.analyticsGroup")
   val institutionsGroup =
     config.getString("hmda.kafka.groups.institutionsGroup")
+  val dataQualityGroup =
+    config.getString("hmda.kafka.groups.dataQualityGroup")
 }

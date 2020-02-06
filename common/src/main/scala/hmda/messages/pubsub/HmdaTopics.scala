@@ -14,4 +14,6 @@ object HmdaTopics {
   val disclosureTopic  = config.getString("hmda.kafka.topics.disclosureTopic")
   val adTopic          = config.getString("hmda.kafka.topics.adTopic")
   val emailTopic       = config.getString("hmda.kafka.topics.emailTopic")
+  val dataQualityTopic       = config.getString("hmda.kafka.topics.dataQualityTopic")
+
 }
