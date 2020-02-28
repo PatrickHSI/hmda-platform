@@ -54,9 +54,6 @@ object HmdaAnalyticsApp extends App with TransmittalSheetComponent with LarCompo
 
   val kafkaConfig = system.settings.config.getConfig("akka.kafka.consumer")
   val config      = ConfigFactory.load()
-  val bankFilter  = config.getConfig("filter")
-  val bankFilterList =
-    bankFilter.getString("bank-filter-list").toUpperCase.split(",")
   val parallelism = config.getInt("hmda.analytics.parallelism")
 
   /**
@@ -102,7 +99,7 @@ object HmdaAnalyticsApp extends App with TransmittalSheetComponent with LarCompo
     Source
       .single(msg)
       .map(msg => SubmissionId(msg))
-      .filter(institution => filterBankWithLogging(institution.lei, bankFilterList))
+      .filter(institution => filterBankWithLogging(institution.lei))
       .mapAsync(1) { id =>
         log.info(s"Adding data for  $id")
         addTs(id)
@@ -110,8 +107,7 @@ object HmdaAnalyticsApp extends App with TransmittalSheetComponent with LarCompo
       .toMat(Sink.ignore)(Keep.right)
       .run()
   private def addTs(submissionId: SubmissionId): Future[Done] = {
-    var submissionIdVar = None: Option[String]
-    submissionIdVar = Some(submissionId.toString)
+    val submissionIdOption = Some(submissionId.toString)
 
     def signDate: Future[Option[Long]] =
       readSubmission(submissionId)
@@ -125,7 +121,7 @@ object HmdaAnalyticsApp extends App with TransmittalSheetComponent with LarCompo
         .map(s => TsCsvParser(s, fromCassandra = true))
         .map(_.getOrElse(TransmittalSheet()))
         .filter(t => t.LEI != "" && t.institutionName != "")
-        .map(ts => TransmittalSheetConverter(ts, submissionIdVar))
+        .map(ts => TransmittalSheetConverter(ts, submissionIdOption))
         .mapAsync(1) { ts =>
           for {
             delete <- submissionId.period match {
@@ -149,7 +145,7 @@ object HmdaAnalyticsApp extends App with TransmittalSheetComponent with LarCompo
         .map(s => TsCsvParser(s, fromCassandra = true))
         .map(_.getOrElse(TransmittalSheet()))
         .filter(t => t.LEI != "" && t.institutionName != "")
-        .map(ts => TransmittalSheetConverter(ts, submissionIdVar))
+        .map(ts => TransmittalSheetConverter(ts, submissionIdOption))
         .mapAsync(1) { ts =>
           for {
             signdate          <- signDate
@@ -169,7 +165,7 @@ object HmdaAnalyticsApp extends App with TransmittalSheetComponent with LarCompo
         .map(s => TsCsvParser(s, fromCassandra = true))
         .map(_.getOrElse(TransmittalSheet()))
         .filter(t => t.LEI != "" && t.institutionName != "")
-        .map(ts => TransmittalSheetConverter(ts, submissionIdVar))
+        .map(ts => TransmittalSheetConverter(ts, submissionIdOption))
         .mapAsync(1) { ts =>
           for {
             signdate          <- signDate

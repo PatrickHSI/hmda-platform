@@ -1,4 +1,4 @@
-package hmda.validation.rules.lar.quality.twentytwenty
+package hmda.validation.rules.lar.quality._2020
 
 import hmda.model.filing.lar.LoanApplicationRegister
 import hmda.model.filing.lar.enums._
@@ -8,7 +8,7 @@ import hmda.validation.dsl.ValidationResult
 import hmda.validation.rules.EditCheck
 
 object Q653_1 extends EditCheck[LoanApplicationRegister] {
-  override def name: String = "Q653_1"
+  override def name: String = "Q653-1"
 
   override def parent: String = "Q653"
 
