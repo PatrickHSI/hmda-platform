@@ -8,9 +8,9 @@ import akka.kafka.scaladsl.Consumer.DrainingControl
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import com.typesafe.config.ConfigFactory
+import hmda.messages.data.quality.DataQualityEvents.{DataQualityKafkaEvent, UpdatePublicTable, UpdateRegulatorTable}
 import hmda.messages.pubsub.{HmdaGroups, HmdaTopics}
 import hmda.publication.KafkaUtils.kafkaHosts
-import hmda.serialization.kafka.DataQualityKafkaEventsDeserializer
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.LoggerFactory
