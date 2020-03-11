@@ -2,11 +2,11 @@ package hmda.data.quality
 
 import akka.Done
 import akka.actor.ActorSystem
-import akka.kafka.scaladsl.Consumer
 import akka.kafka.{ConsumerSettings, Subscriptions}
+import akka.kafka.scaladsl.Consumer
 import akka.kafka.scaladsl.Consumer.DrainingControl
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.typed.scaladsl.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import hmda.messages.data.quality.DataQualityEvents.{DataQualityKafkaEvent, UpdatePublicTable, UpdateRegulatorTable}
 import hmda.messages.pubsub.{HmdaGroups, HmdaTopics}
@@ -16,8 +16,10 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 
-object HmdaDataQualityApp extends App {
+object HmdaDataQualityApp  extends App{
 
   val log = LoggerFactory.getLogger("hmda")
 
@@ -37,7 +39,6 @@ object HmdaDataQualityApp extends App {
 
 
   implicit val system = ActorSystem("hmda-data-quality")
-  implicit val materializer = ActorMaterializer()
   implicit val ec = system.dispatcher
 
   val host = config.getString("hmda.data.quality.http.host")
@@ -50,13 +51,13 @@ object HmdaDataQualityApp extends App {
 
  // system.actorOf(HmdaDataQualityApi.props(), "hmda-data-quality-api")
 
-val consumerSettings: ConsumerSettings[String,DataQualityEventKafkaEvent] =
-    ConsumerSettings(kafkaConfig,
-      new StringDeserializer,
-      new DataQualityKafkaEventsDeserializer)
+
+  val consumerSettings: ConsumerSettings[String, String] =
+    ConsumerSettings(kafkaConfig, new StringDeserializer, new StringDeserializer)
       .withBootstrapServers(kafkaHosts)
-      .withGroupId(HmdaGroups.dataQualityGroup)
+      .withGroupId(HmdaGroups.analyticsGroup)
       .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+   
 
   Consumer
     .committableSource(consumerSettings,
@@ -81,7 +82,7 @@ val consumerSettings: ConsumerSettings[String,DataQualityEventKafkaEvent] =
             evt.dataQualityEvent.asInstanceOf[UpdateRegulatorTable]
           case "UpdatePublicTable" =>
             evt.dataQualityEvent.asInstanceOf[UpdatePublicTable]
-        case _ => evt.DataQualityEvent
+        case _ => log.("SOME STUFF HAPPEND!!!!")
         }
         dataQualityDBProjector ! ProjectEvent(evtType)
       }
