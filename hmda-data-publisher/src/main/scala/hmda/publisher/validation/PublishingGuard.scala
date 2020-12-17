@@ -42,7 +42,7 @@ class PublishingGuard(
   private def getChecks(year: Period, scope: Scope): List[ValidationCheck] = {
     val leiCheckErrorMargin = year match {
       case Period.y2018   => 5
-      case Period.y2019   => 0
+      case Period.y2019   => 2
       case Period.y2020   => 0
       case Period.y2020Q1 => 0
       case Period.y2020Q2 => 0
