@@ -1,5 +1,8 @@
 package hmda.publisher.scheduler
 
+import java.time.Instant
+
+import akka.actor.typed.ActorRef
 import akka.stream.Materializer
 import akka.stream.alpakka.s3.ApiVersion.ListBucketVersion2
 import akka.stream.alpakka.s3._
@@ -16,13 +19,16 @@ import hmda.query.ts._
 import hmda.util.BankFilterUtils._
 import akka.stream.alpakka.file.scaladsl.Archive
 import akka.stream.alpakka.file.ArchiveMetadata
+import hmda.publisher.scheduler.schedules.Schedule
+import hmda.publisher.util.PublishingReporter
+import hmda.publisher.util.PublishingReporter.Command.FilePublishingCompleted
 import hmda.publisher.validation.PublishingGuard
 import hmda.publisher.validation.PublishingGuard.{Period, Scope}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class TsPublicScheduler
+class TsPublicScheduler(publishingReporter: ActorRef[PublishingReporter.Command])
   extends HmdaActor
     with PublisherComponent2018
     with PublisherComponent2019
@@ -58,33 +64,33 @@ class TsPublicScheduler
   }
   override def receive: Receive = {
 
-    case TsPublicScheduler2018 =>
+    case schedule @ TsPublicScheduler2018 =>
       publishingGuard.runIfDataIsValid(Period.y2018, Scope.Public) {
         val fileName         = "2018_ts.txt"
         val zipDirectoryName = "2018_ts.zip"
         val s3Path           = s"$environmentPublic/dynamic-data/2018/"
         val fullFilePath     = SnapshotCheck.pathSelector(s3Path, zipDirectoryName)
         if (SnapshotCheck.snapshotActive) {
-          tsPublicStream("2018", SnapshotCheck.snapshotBucket, fullFilePath, fileName)
+          tsPublicStream("2018", SnapshotCheck.snapshotBucket, fullFilePath, fileName, schedule)
         } else {
-          tsPublicStream("2018", bucketPublic, fullFilePath, fileName)
+          tsPublicStream("2018", bucketPublic, fullFilePath, fileName, schedule)
         }
       }
 
-    case TsPublicScheduler2019 =>
+    case schedule @ TsPublicScheduler2019 =>
       publishingGuard.runIfDataIsValid(Period.y2019, Scope.Public) {
         val fileName         = "2019_ts.txt"
         val zipDirectoryName = "2019_ts.zip"
         val s3Path           = s"$environmentPublic/dynamic-data/2019/"
         val fullFilePath     = SnapshotCheck.pathSelector(s3Path, zipDirectoryName)
         if (SnapshotCheck.snapshotActive) {
-          tsPublicStream("2019", SnapshotCheck.snapshotBucket, fullFilePath, fileName)
+          tsPublicStream("2019", SnapshotCheck.snapshotBucket, fullFilePath, fileName, schedule)
         } else {
-          tsPublicStream("2019", bucketPublic, fullFilePath, fileName)
+          tsPublicStream("2019", bucketPublic, fullFilePath, fileName, schedule)
         }
       }
   }
-  private def tsPublicStream(year: String, bucket: String, key: String, fileName: String) = {
+  private def tsPublicStream(year: String, bucket: String, key: String, fileName: String, schedule: Schedule): Unit = {
 
     val s3SinkPSV =
       S3.multipartUpload(bucket, key).withAttributes(S3Attributes.settings(s3Settings))
@@ -119,8 +125,10 @@ class TsPublicScheduler
 
     resultsPSV onComplete {
       case Success(result) =>
+        publishingReporter ! FilePublishingCompleted(schedule, key, None, Instant.now, FilePublishingCompleted.Status.Success)
         log.info("Pushed to S3: " + s"$bucket/$key" + ".")
       case Failure(t) =>
+        publishingReporter ! FilePublishingCompleted(schedule, key, None, Instant.now, FilePublishingCompleted.Status.Error(t.getMessage))
         log.info("An error has occurred with: " + key + "; Getting Public TS Data in Future: " + t.getMessage)
     }
   }

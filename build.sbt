@@ -204,7 +204,7 @@ lazy val `hmda-data-publisher` = (project in file("hmda-data-publisher"))
   .settings(hmdaBuildSettings: _*)
   .settings(
     Seq(
-      libraryDependencies ++= commonDeps ++ akkaDeps ++ akkaHttpDeps ++ circeDeps ++ slickDeps ++ enumeratumDeps,
+      libraryDependencies ++= commonDeps ++ akkaDeps ++ akkaHttpDeps ++ circeDeps ++ slickDeps ++ enumeratumDeps :+ scalaMock,
       mainClass in Compile := Some("hmda.publisher.HmdaDataPublisherApp"),
       assemblyJarName in assembly := {
         s"${name.value}.jar"
@@ -249,7 +249,9 @@ lazy val `hmda-dashboard` = (project in file("hmda-dashboard"))
       },
       assemblyJarName in assembly := {
         s"${name.value}.jar"
-      }
+      },
+      javaOptions in reStart += "-Xmx8g",
+      Revolver.enableDebugging(5006)
     ),
     dockerSettings,
     packageSettings

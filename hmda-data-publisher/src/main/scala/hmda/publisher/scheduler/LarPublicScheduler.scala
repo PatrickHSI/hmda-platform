@@ -1,6 +1,9 @@
 package hmda.publisher.scheduler
 
+import java.time.Instant
+
 import akka.NotUsed
+import akka.actor.typed.ActorRef
 import akka.stream.Materializer
 import akka.stream.alpakka.file.ArchiveMetadata
 import akka.stream.alpakka.file.scaladsl.Archive
@@ -14,7 +17,10 @@ import hmda.actor.HmdaActor
 import hmda.publisher.helper._
 import hmda.publisher.query.component.{PublisherComponent2018, PublisherComponent2019, PublisherComponent2020}
 import hmda.publisher.query.lar.ModifiedLarEntityImpl
+import hmda.publisher.scheduler.schedules.Schedule
 import hmda.publisher.scheduler.schedules.Schedules.{LarPublicScheduler2018, LarPublicScheduler2019}
+import hmda.publisher.util.PublishingReporter
+import hmda.publisher.util.PublishingReporter.Command.FilePublishingCompleted
 import hmda.publisher.validation.PublishingGuard
 import hmda.publisher.validation.PublishingGuard.{Period, Scope}
 import hmda.query.DbConfiguration.dbConfig
@@ -23,7 +29,7 @@ import slick.basic.DatabasePublisher
 
 import scala.util.{Failure, Success}
 
-class LarPublicScheduler
+class LarPublicScheduler(publishingReporter: ActorRef[PublishingReporter.Command])
   extends HmdaActor
     with PublisherComponent2018
     with PublisherComponent2019
@@ -57,35 +63,35 @@ class LarPublicScheduler
     QuartzSchedulerExtension(context.system).cancelJob("LarPublicScheduler2019")
   }
   override def receive: Receive = {
-    case LarPublicScheduler2018 =>
+    case schedule @ LarPublicScheduler2018 =>
       publishingGuard.runIfDataIsValid(Period.y2018, Scope.Public) {
         val fileName         = "2018_lar.txt"
         val zipDirectoryName = "2018_lar.zip"
         val s3Path           = s"$environmentPublic/dynamic-data/2018/"
         val fullFilePath     = SnapshotCheck.pathSelector(s3Path, zipDirectoryName)
         if (SnapshotCheck.snapshotActive) {
-          larPublicStream("2018", SnapshotCheck.snapshotBucket, fullFilePath, fileName)
+          larPublicStream("2018", SnapshotCheck.snapshotBucket, fullFilePath, fileName, schedule)
         } else {
-          larPublicStream("2018", bucketPublic, fullFilePath, fileName)
+          larPublicStream("2018", bucketPublic, fullFilePath, fileName, schedule)
         }
       }
 
-    case LarPublicScheduler2019 =>
+    case schedule @ LarPublicScheduler2019 =>
       publishingGuard.runIfDataIsValid(Period.y2019, Scope.Public) {
         val fileName         = "2019_lar.txt"
         val zipDirectoryName = "2019_lar.zip"
         val s3Path           = s"$environmentPublic/dynamic-data/2019/"
         val fullFilePath     = SnapshotCheck.pathSelector(s3Path, zipDirectoryName)
         if (SnapshotCheck.snapshotActive) {
-          larPublicStream("2019", SnapshotCheck.snapshotBucket, fullFilePath, fileName)
+          larPublicStream("2019", SnapshotCheck.snapshotBucket, fullFilePath, fileName, schedule)
         } else {
-          larPublicStream("2019", bucketPublic, fullFilePath, fileName)
+          larPublicStream("2019", bucketPublic, fullFilePath, fileName, schedule)
         }
       }
 
   }
 
-  private def larPublicStream(year: String, bucket: String, key: String, fileName: String): Unit = {
+  private def larPublicStream(year: String, bucket: String, key: String, fileName: String, schedule: Schedule): Unit = {
 
     val allResultsPublisher: DatabasePublisher[ModifiedLarEntityImpl] =
       year match {
@@ -119,10 +125,20 @@ class LarPublicScheduler
       uploadResult <- S3Utils.uploadWithRetry(source, s3SinkPSV)
     } yield uploadResult
 
+    def sendPublishingNotif(error: Option[String]): Unit = {
+      val status = error match {
+        case Some(value) => FilePublishingCompleted.Status.Error(value)
+        case None        => FilePublishingCompleted.Status.Success
+      }
+      publishingReporter ! FilePublishingCompleted(schedule, key, None, Instant.now(), status)
+    }
+
     resultsPSV onComplete {
       case Success(result) =>
+        sendPublishingNotif(None)
         log.info("Pushed to S3: " + s"$bucket/$key" + ".")
       case Failure(t) =>
+        sendPublishingNotif(Some(t.getMessage))
         log.info("An error has occurred with: " + key + "; Getting Public LAR Data in Future: " + t.getMessage)
     }
   }

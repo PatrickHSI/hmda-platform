@@ -1,4 +1,4 @@
-package hmda.publisher.validation
+package hmda.publisher.util
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -13,7 +13,7 @@ import scala.concurrent.Future
  * curl -i -X POST -H 'Content-Type: application/json' -d '{"text": "Hello, this is some text\nThis is more text. :tada:"}' https://mattermost.goraft.tech/hooks/xxx
  * @param mattermostUrl
  */
-class MessageReporter(mattermostUrl: String)(implicit as: ActorSystem) extends LazyLogging {
+class MattermostNotifier(mattermostUrl: String)(implicit as: ActorSystem) extends LazyLogging {
   import as.dispatcher
 
   def report(message: String): Future[Unit] =

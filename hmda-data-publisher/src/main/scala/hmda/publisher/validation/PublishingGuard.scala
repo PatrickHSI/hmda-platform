@@ -1,22 +1,23 @@
 package hmda.publisher.validation
 
 import akka.actor.ActorSystem
-import cats.data.{ Validated, ValidatedNel }
+import cats.data.{Validated, ValidatedNel}
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
-import hmda.publisher.query.component.{ PublisherComponent2018, PublisherComponent2019, PublisherComponent2020 }
-import hmda.publisher.validation.PublishingGuard.{ Period, Scope }
+import hmda.publisher.query.component.{PublisherComponent2018, PublisherComponent2019, PublisherComponent2020}
+import hmda.publisher.util.MattermostNotifier
+import hmda.publisher.validation.PublishingGuard.{Period, Scope}
 import hmda.query.DbConfiguration
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 class PublishingGuard(
                        db2018: PublisherComponent2018,
                        db2019: PublisherComponent2019,
                        db2020: PublisherComponent2020,
-                       messageReporter: MessageReporter,
+                       messageReporter: MattermostNotifier,
                        dbConfig: DatabaseConfig[JdbcProfile]
                      )(
                        implicit ec: ExecutionContext
@@ -116,7 +117,7 @@ object PublishingGuard {
             )(implicit as: ActorSystem): PublishingGuard = {
     import as.dispatcher
     val config      = ConfigFactory.load("application.conf")
-    val msgReporter = new MessageReporter(config.getString("hmda.publisher.validation.reportingUrl"))
+    val msgReporter = new MattermostNotifier(config.getString("hmda.publisher.validation.reportingUrl"))
     val dbConfig    = DbConfiguration.dbConfig
     new PublishingGuard(dbCompontnents, dbCompontnents, dbCompontnents, msgReporter, dbConfig)
   }

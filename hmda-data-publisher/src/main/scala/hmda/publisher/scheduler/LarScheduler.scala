@@ -1,9 +1,10 @@
 package hmda.publisher.scheduler
 
 import java.time.format.DateTimeFormatter
-import java.time.{Clock, LocalDateTime}
+import java.time.{Clock, Instant, LocalDateTime}
 
 import akka.NotUsed
+import akka.actor.typed.ActorRef
 import akka.stream.Materializer
 import akka.stream.alpakka.s3.ApiVersion.ListBucketVersion2
 import akka.stream.alpakka.s3.scaladsl.S3
@@ -18,7 +19,10 @@ import hmda.model.publication.Msa
 import hmda.publisher.helper._
 import hmda.publisher.query.component.{PublisherComponent2018, PublisherComponent2019, PublisherComponent2020}
 import hmda.publisher.query.lar.{LarEntityImpl2019, LarEntityImpl2020}
+import hmda.publisher.scheduler.schedules.Schedule
 import hmda.publisher.scheduler.schedules.Schedules.{LarScheduler2018, LarScheduler2019, LarScheduler2020, LarSchedulerLoanLimit2019, LarSchedulerLoanLimit2020, LarSchedulerQuarterly2020}
+import hmda.publisher.util.PublishingReporter
+import hmda.publisher.util.PublishingReporter.Command.FilePublishingCompleted
 import hmda.publisher.validation.PublishingGuard
 import hmda.publisher.validation.PublishingGuard.{Period, Scope}
 import hmda.query.DbConfiguration.dbConfig
@@ -27,7 +31,7 @@ import hmda.util.BankFilterUtils._
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class LarScheduler
+class LarScheduler (publishingReporter: ActorRef[PublishingReporter.Command])
   extends HmdaActor
     with PublisherComponent2018
     with PublisherComponent2019
@@ -47,7 +51,7 @@ class LarScheduler
   def larRepository2020Q2              = new LarRepository2020Q2(dbConfig)
   def larRepository2020Q3              = new LarRepository2020Q3(dbConfig)
   val publishingGuard: PublishingGuard = PublishingGuard.create(this)(context.system)
-  val timeBarrier: QuarterTimeBarrier = new QuarterTimeBarrier(Clock.systemDefaultZone())
+  val timeBarrier: QuarterTimeBarrier  = new QuarterTimeBarrier(Clock.systemDefaultZone())
 
   val indexTractMap2018: Map[String, Census] = CensusRecords.indexedTract2018
   val indexTractMap2019: Map[String, Census] = CensusRecords.indexedTract2019
@@ -87,7 +91,7 @@ class LarScheduler
 
   override def receive: Receive = {
 
-    case LarScheduler2018 =>
+    case schedule @ LarScheduler2018 =>
       publishingGuard.runIfDataIsValid(Period.y2018, Scope.Private) {
         val now           = LocalDateTime.now().minusDays(1)
         val formattedDate = fullDate.format(now)
@@ -100,10 +104,10 @@ class LarScheduler
 
         def countF: Future[Int] = larRepository2018.getAllLARsCount(getFilterList())
 
-        publishPSVtoS3(fileName, allResultsSource, countF)
+        publishPSVtoS3(fileName, allResultsSource, countF, schedule)
       }
 
-    case LarScheduler2019 =>
+    case schedule @ LarScheduler2019 =>
       publishingGuard.runIfDataIsValid(Period.y2019, Scope.Private) {
         val now           = LocalDateTime.now().minusDays(1)
         val formattedDate = fullDate.format(now)
@@ -115,10 +119,10 @@ class LarScheduler
 
         def countF: Future[Int] = larRepository2019.getAllLARsCount(getFilterList())
 
-        publishPSVtoS3(fileName, allResultsSource, countF)
+        publishPSVtoS3(fileName, allResultsSource, countF, schedule)
       }
 
-    case LarScheduler2020 =>
+    case schedule @ LarScheduler2020 =>
       publishingGuard.runIfDataIsValid(Period.y2020, Scope.Private) {
         val now           = LocalDateTime.now().minusDays(1)
         val formattedDate = fullDate.format(now)
@@ -130,10 +134,10 @@ class LarScheduler
 
         def countF: Future[Int] = larRepository2020.getAllLARsCount(getFilterList())
 
-        publishPSVtoS3(fileName, allResultsSource, countF)
+        publishPSVtoS3(fileName, allResultsSource, countF, schedule)
       }
 
-    case LarSchedulerLoanLimit2019 =>
+    case schedule @ LarSchedulerLoanLimit2019 =>
       publishingGuard.runIfDataIsValid(Period.y2019, Scope.Private) {
         val now           = LocalDateTime.now().minusDays(1)
         val formattedDate = fullDate.format(now)
@@ -146,10 +150,10 @@ class LarScheduler
 
         def countF: Future[Int] = larRepository2019.getAllLARsCount(getFilterList())
 
-        publishPSVtoS3(fileName, allResultsSource, countF)
+        publishPSVtoS3(fileName, allResultsSource, countF, schedule)
       }
 
-    case LarSchedulerLoanLimit2020 =>
+    case schedule @ LarSchedulerLoanLimit2020 =>
       publishingGuard.runIfDataIsValid(Period.y2020, Scope.Private) {
         val now           = LocalDateTime.now().minusDays(1)
         val formattedDate = fullDate.format(now)
@@ -162,10 +166,10 @@ class LarScheduler
 
         def countF: Future[Int] = larRepository2020.getAllLARsCount(getFilterList())
 
-        publishPSVtoS3(fileName, allResultsSource, countF)
+        publishPSVtoS3(fileName, allResultsSource, countF, schedule)
       }
 
-    case LarSchedulerQuarterly2020 =>
+    case schedule @ LarSchedulerQuarterly2020 =>
       val includeQuarterly = true
       val now              = LocalDateTime.now().minusDays(1)
       val formattedDate    = fullDateQuarterly.format(now)
@@ -181,7 +185,7 @@ class LarScheduler
 
             def countF: Future[Int] = repo.getAllLARsCount(getFilterList())
 
-            publishPSVtoS3(fileName, allResultsSource, countF)
+            publishPSVtoS3(fileName, allResultsSource, countF, schedule)
           }
         }
       }
@@ -191,7 +195,7 @@ class LarScheduler
       publishQuarter(Period.y2020Q3, "quarter_3_2020_lar.txt", larRepository2020Q3)
   }
 
-  def publishPSVtoS3(fileName: String, rows: Source[String, NotUsed], countF: => Future[Int]): Unit = {
+  def publishPSVtoS3(fileName: String, rows: Source[String, NotUsed], countF: => Future[Int], schedule: Schedule): Unit = {
     val s3Path       = s"$environmentPrivate/lar/"
     val fullFilePath = SnapshotCheck.pathSelector(s3Path, fileName)
 
@@ -205,13 +209,24 @@ class LarScheduler
       s3Sink = S3
         .multipartUpload(bucketPrivate, fullFilePath, metaHeaders = MetaHeaders(Map(LarScheduler.entriesCountMetaName -> count.toString)))
         .withAttributes(S3Attributes.settings(s3Settings))
-      result <- S3Utils.uploadWithRetry(bytesStream, s3Sink)
-    } yield result
+      _ <- S3Utils.uploadWithRetry(bytesStream, s3Sink)
+    } yield count
+
+    def sendPublishingNotif(error: Option[String], count: Option[Int]): Unit = {
+      val status = error match {
+        case Some(value) => FilePublishingCompleted.Status.Error(value)
+        case None        => FilePublishingCompleted.Status.Success
+      }
+      publishingReporter ! FilePublishingCompleted(schedule, fullFilePath, count, Instant.now(), status)
+    }
+
 
     results onComplete {
-      case Success(result) =>
+      case Success(count) =>
+        sendPublishingNotif(None, Some(count))
         log.info(s"Pushed to S3: $bucketPrivate/$fullFilePath.")
       case Failure(t) =>
+        sendPublishingNotif(Some(t.getMessage), None)
         log.info(s"An error has occurred pushing LAR Data to $bucketPrivate/$fullFilePath: ${t.getMessage}")
     }
 

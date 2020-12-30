@@ -1,8 +1,9 @@
 package hmda.publisher.scheduler
 
-import java.time.{Clock, LocalDateTime}
+import java.time.{Clock, Instant, LocalDateTime}
 import java.time.format.DateTimeFormatter
 
+import akka.actor.typed.ActorRef
 import akka.stream.Materializer
 import akka.stream.alpakka.s3.ApiVersion.ListBucketVersion2
 import akka.stream.alpakka.s3._
@@ -15,6 +16,8 @@ import hmda.actor.HmdaActor
 import hmda.publisher.helper.{PrivateAWSConfigLoader, QuarterTimeBarrier, S3Utils, SnapshotCheck}
 import hmda.publisher.query.component.{PublisherComponent2018, PublisherComponent2019, PublisherComponent2020}
 import hmda.publisher.scheduler.schedules.Schedules.{TsScheduler2018, TsScheduler2019, TsScheduler2020, TsSchedulerQuarterly2020}
+import hmda.publisher.util.PublishingReporter
+import hmda.publisher.util.PublishingReporter.Command.FilePublishingCompleted
 import hmda.publisher.validation.PublishingGuard
 import hmda.publisher.validation.PublishingGuard.{Period, Scope}
 import hmda.query.DbConfiguration.dbConfig
@@ -24,7 +27,7 @@ import hmda.util.BankFilterUtils._
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class TsScheduler
+class TsScheduler(publishingReporter: ActorRef[PublishingReporter.Command])
   extends HmdaActor
     with PublisherComponent2018
     with PublisherComponent2019
@@ -87,7 +90,7 @@ class TsScheduler
 
   override def receive: Receive = {
 
-    case TsScheduler2018 =>
+    case schedule @ TsScheduler2018 =>
       publishingGuard.runIfDataIsValid(Period.y2018, Scope.Private) {
         val now           = LocalDateTime.now().minusDays(1)
         val formattedDate = fullDate.format(now)
@@ -104,14 +107,16 @@ class TsScheduler
 
         results onComplete {
           case Success(result) =>
+            publishingReporter ! FilePublishingCompleted(schedule, fullFilePath, None, Instant.now, FilePublishingCompleted.Status.Success)
             log.info("Pushed to S3: " + bucketPrivate + "/" + fullFilePath + ".")
 
           case Failure(t) =>
+            publishingReporter ! FilePublishingCompleted(schedule, fullFilePath, None, Instant.now, FilePublishingCompleted.Status.Error(t.getMessage))
             log.error("An error has occurred getting TS Data 2018: " + t.getMessage)
         }
       }
 
-    case TsScheduler2019 =>
+    case schedule @ TsScheduler2019 =>
       publishingGuard.runIfDataIsValid(Period.y2019, Scope.Private) {
         val now           = LocalDateTime.now().minusDays(1)
         val formattedDate = fullDate.format(now)
@@ -128,14 +133,16 @@ class TsScheduler
 
         results onComplete {
           case Success(result) =>
+            publishingReporter ! FilePublishingCompleted(schedule, fullFilePath, None, Instant.now, FilePublishingCompleted.Status.Success)
             log.info("Pushed to S3: " + s"$bucketPrivate/$fullFilePath" + ".")
 
           case Failure(t) =>
+            publishingReporter ! FilePublishingCompleted(schedule, fullFilePath, None, Instant.now, FilePublishingCompleted.Status.Error(t.getMessage))
             log.error("An error has occurred getting TS Data 2019: " + t.getMessage)
         }
       }
 
-    case TsScheduler2020 =>
+    case schedule @ TsScheduler2020 =>
       publishingGuard.runIfDataIsValid(Period.y2020, Scope.Private) {
         val now           = LocalDateTime.now().minusDays(1)
         val formattedDate = fullDate.format(now)
@@ -152,13 +159,15 @@ class TsScheduler
 
         results onComplete {
           case Success(result) =>
+            publishingReporter ! FilePublishingCompleted(schedule, fullFilePath, None, Instant.now, FilePublishingCompleted.Status.Success)
             log.info("Pushed to S3: " + s"$bucketPrivate/$fullFilePath" + ".")
 
           case Failure(t) =>
+            publishingReporter ! FilePublishingCompleted(schedule, fullFilePath, None, Instant.now, FilePublishingCompleted.Status.Error(t.getMessage))
             log.error("An error has occurred getting TS Data 2020: " + t.getMessage)
         }
       }
-    case TsSchedulerQuarterly2020 =>
+    case schedule @ TsSchedulerQuarterly2020 =>
       val includeQuarterly = true;
       val now              = LocalDateTime.now().minusDays(1)
       val formattedDate    = fullDateQuarterly.format(now)
@@ -179,8 +188,10 @@ class TsScheduler
               uploadFileToS3(s3Sink, data)
             results onComplete {
               case Success(result) =>
+                publishingReporter ! FilePublishingCompleted(schedule, fullFilePath, None, Instant.now, FilePublishingCompleted.Status.Success)
                 log.info("Pushed to S3: " + s"$bucketPrivate/$fullFilePath" + ".")
               case Failure(t) =>
+                publishingReporter ! FilePublishingCompleted(schedule, fullFilePath, None, Instant.now, FilePublishingCompleted.Status.Error(t.getMessage))
                 log.error("An error has occurred getting Quarterly TS Data 2020: " + t.getMessage)
             }
           }

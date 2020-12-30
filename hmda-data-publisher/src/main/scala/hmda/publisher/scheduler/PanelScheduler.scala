@@ -1,8 +1,9 @@
 package hmda.publisher.scheduler
 
-import java.time.LocalDateTime
+import java.time.{Instant, LocalDateTime}
 import java.time.format.DateTimeFormatter
 
+import akka.actor.typed.ActorRef
 import akka.stream.Materializer
 import akka.stream.alpakka.s3.ApiVersion.ListBucketVersion2
 import akka.stream.alpakka.s3.scaladsl.S3
@@ -16,13 +17,15 @@ import hmda.publisher.helper.{PrivateAWSConfigLoader, S3Utils, SnapshotCheck}
 import hmda.publisher.query.component.{InstitutionEmailComponent, PublisherComponent2018, PublisherComponent2019}
 import hmda.publisher.query.panel.{InstitutionAltEntity, InstitutionEmailEntity, InstitutionEntity}
 import hmda.publisher.scheduler.schedules.Schedules.{PanelScheduler2018, PanelScheduler2019}
+import hmda.publisher.util.PublishingReporter
+import hmda.publisher.util.PublishingReporter.Command.FilePublishingCompleted
 import hmda.query.DbConfiguration.dbConfig
 import hmda.util.BankFilterUtils._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class PanelScheduler extends HmdaActor with PublisherComponent2018 with PublisherComponent2019 with InstitutionEmailComponent with PrivateAWSConfigLoader {
+class PanelScheduler(publishingReporter: ActorRef[PublishingReporter.Command]) extends HmdaActor with PublisherComponent2018 with PublisherComponent2019 with InstitutionEmailComponent with PrivateAWSConfigLoader {
 
   implicit val ec: ExecutionContext       = context.system.dispatcher
   implicit val materializer: Materializer = Materializer(context)
@@ -88,8 +91,10 @@ class PanelScheduler extends HmdaActor with PublisherComponent2018 with Publishe
 
     results onComplete {
       case Success(result) =>
+        publishingReporter ! FilePublishingCompleted(PanelScheduler2018, fullFilePath, None, Instant.now, FilePublishingCompleted.Status.Success)
         log.info("Pushed to S3: " + s"$bucketPrivate/$fullFilePath" +".")
       case Failure(t) =>
+        publishingReporter ! FilePublishingCompleted(PanelScheduler2018, fullFilePath, None, Instant.now, FilePublishingCompleted.Status.Error(t.getMessage))
         log.error("An error has occurred getting Panel Data 2018: " + t.getMessage)
     }
   }
