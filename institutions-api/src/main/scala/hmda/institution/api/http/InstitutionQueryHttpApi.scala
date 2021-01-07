@@ -11,7 +11,9 @@ import hmda.api.http.directives.CreateFilingAuthorization._
 import hmda.api.http.model.ErrorResponse
 import hmda.institution.api.http.model.{InstitutionNoteHistoryResponse, InstitutionsResponse}
 import hmda.institution.query._
+
 import hmda.model.institution.Institution
+import hmda.util.EmailDomainUtils._
 import hmda.utils.YearUtils._
 import io.circe.generic.auto._
 import slick.basic.DatabaseConfig
@@ -87,11 +89,17 @@ private class InstitutionQueryHttpApi(config: Config)(implicit ec: ExecutionCont
       (extractUri & get) { uri =>
         isFilingAllowed(year, None) {
           parameter('domain.as[String]) { domain =>
+          if(bannedDomainCheck(domain)){
+            val errorResponse = ErrorResponse(404, StatusCodes.NotFound.defaultMessage, uri.path)
+            complete(ToResponseMarshallable(StatusCodes.NotFound -> errorResponse))
+          }else{
             val f = findByEmail(domain, year.toString)
             completeInstitutionsFuture(f, uri)
+          }
           } ~
             parameters(('domain.as[String], 'lei.as[String], 'respondentName.as[String], 'taxId.as[String])) {
               (domain, lei, respondentName, taxId) =>
+
                 val f = findByFields(lei, respondentName, taxId, domain, year.toString)
                 completeInstitutionsFuture(f, uri)
             }
