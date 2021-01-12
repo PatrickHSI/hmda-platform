@@ -35,6 +35,7 @@ private class DataPublisherHttpApi(
     val receiver = msg match {
       case Schedules.PanelScheduler2018        => panelScheduler
       case Schedules.PanelScheduler2019        => panelScheduler
+      case Schedules.PanelScheduler2020        => panelScheduler
       case Schedules.LarPublicScheduler2018    => larPublicScheduler
       case Schedules.LarPublicScheduler2019    => larPublicScheduler
       case Schedules.LarScheduler2018          => larScheduler
