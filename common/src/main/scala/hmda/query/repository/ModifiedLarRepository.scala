@@ -287,7 +287,7 @@ class ModifiedLarRepository(databaseConfig: DatabaseConfig[JdbcProfile]) {
     Try(s.toInt).toOption
 
   private def incomeCategorization(larIncome: String, censusMedianIncome: Int): String =
-    if (larIncome == "NA")
+    if (larIncome == "NA" || larIncome == "")
       "NA"
     else {
       //income in the lar is rounded to 1000
