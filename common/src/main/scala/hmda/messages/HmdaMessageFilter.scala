@@ -12,7 +12,7 @@ object HmdaMessageFilter extends StrictLogging {
 
   def parse(key: String, value: String): Option[StandardMsg] = {
     Try {
-      val leiRegex = "(?<lei>[A-Z0-9]+)"
+      val leiRegex = "(?<lei>[a-zA-Z0-9]+)"
       val keyRegex = s"^${leiRegex}$$".r
       // lei1:lei2-year-q1-seq_num
       val msgRegex = s"^${leiRegex}-(?<year>[0-9]{4})(-(?<quarter>[qQ][1-3]))?(-(?<seqNum>[0-9]+))?$$".r
